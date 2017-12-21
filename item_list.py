@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from database_setup import Restaurant, Base, MenuItem, User
+from database_setup import Base, User, Categories, Item
 
 engine = create_engine('sqlite:///catalog.db')
 Base.metadata.bind = engine
@@ -15,15 +15,15 @@ session.add(user1)
 session.commit()
 
 catalog1 = Categories(name="Macbook Pro")
-session.add(restaurant1)
+session.add(catalog1)
 session.commit()
 
 catalog2 = Categories(name="iPad")
-session.add(restaurant2)
+session.add(catalog2)
 session.commit()
 
 catalog3 = Categories(name="iPhone")
-session.add(restaurant3)
+session.add(catalog3)
 session.commit()
 
 
