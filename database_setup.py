@@ -36,6 +36,8 @@ class Item(Base):
     description = Column(String(250))
     # price use string?
     price = Column(String(8))
+    category_id = Column(Integer, ForeignKey("categories.id"))
+    categories = relationship(Categories)
     user_id = Column(Integer, ForeignKey("user.id"))
     user = relationship(User)
 

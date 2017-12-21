@@ -12,6 +12,7 @@ import httplib2
 import json
 import requests
 
+
 app = Flask(__name__)
 
 # Connect to Database and create database session
@@ -24,8 +25,15 @@ session = DBSession()
 
 @app.route("/")
 def mainpage():
-    items = session.query(Categories).all()
-    return render_template("publicindex.html",categories=items)
+    all_category = session.query(Categories).all()
+    return render_template("publicindex.html",categories=all_category)
+
+@app.route("/category/<category_name>/")
+def category_page(category_name):
+    the_category = session.query(Categories).filter_by(name=category_name).one()
+    the_item_list = session.query(Item).filter_by(category_id=the_category.id).all()
+    return render_template("category_page.html",
+                            category=the_category, item_list=the_item_list)
 
 
 if __name__ == "__main__":
