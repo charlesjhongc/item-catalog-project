@@ -5,7 +5,7 @@ from sqlalchemy.orm import relationship
 Base = declarative_base()
 
 class User(Base):
-    __tablename__ = 'user'
+    __tablename__ = "user"
 
     id = Column(Integer, primary_key=True)
     name = Column(String(250), nullable=False)
@@ -14,7 +14,7 @@ class User(Base):
 
 
 class Categories(Base):
-    __tablename__ = 'categories'
+    __tablename__ = "categories"
 
     id = Column(Integer, primary_key=True)
     name = Column(String(250), nullable=False)
@@ -23,33 +23,33 @@ class Categories(Base):
     def serialize(self):
         """Return object data in easily serializeable format"""
         return {
-            'name': self.name,
-            'id': self.id,
+            "name": self.name,
+            "id": self.id,
         }
 
 
 class Item(Base):
-    __tablename__ = 'item'
+    __tablename__ = "item"
 
     id = Column(Integer, primary_key=True)
     name = Column(String(80), nullable=False)
     description = Column(String(250))
     # price use string?
     price = Column(String(8))
-    user_id = Column(Integer, ForeignKey('user.id'))
+    user_id = Column(Integer, ForeignKey("user.id"))
     user = relationship(User)
 
     @property
     def serialize(self):
         """Return object data in easily serializeable format"""
         return {
-            'name': self.name,
-            'description': self.description,
-            'id': self.id,
-            'price': self.price,
-            'course': self.course,
+            "name": self.name,
+            "description": self.description,
+            "id": self.id,
+            "price": self.price,
+            "course": self.course,
         }
 
 
-engine = create_engine('sqlite:///catalog.db')
+engine = create_engine("sqlite:///catalog.db")
 Base.metadata.create_all(engine)
