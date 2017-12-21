@@ -40,6 +40,26 @@ def item_page(category_name, item_name):
     the_item = session.query(Item).filter_by(name=item_name).one()
     return render_template("item_page.html", item=the_item)
 
+@app.route("/category/additem/", methods=["GET","POST"])
+def item_add_page():
+    if request.method == "GET":
+        return render_template("item_add_page.html")
+    else:
+
+@app.route("/category/<item_name>/edit/", methods=["GET","POST"])
+def item_edit_page(item_name):
+    if request.method == "GET":
+        the_item = session.query(Item).filter_by(name=item_name).one()
+        return render_template("item_edit_page.html", item=the_item)
+    else:
+
+@app.route("/category/<item_name>/delete/", methods=["GET","POST"])
+def item_delete_page(item_name):
+    if request.method == "GET":
+        the_item = session.query(Item).filter_by(name=item_name).one()
+        return render_template("item_delete_page.html", item=the_item)
+    else:
+
 if __name__ == "__main__":
     #app.secret_key = 'super_secret_key'
     app.debug = True
