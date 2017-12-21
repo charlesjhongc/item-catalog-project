@@ -28,7 +28,7 @@ session.commit()
 
 
 item1 = Item(name="Veggie Burger", description="Juicy grilled veggie patty with tomato mayo and lettuce",
-                     price="$7.50", user_id=1)
+                     price="$7.50", category_id=1, user_id=1)
 
 session.add(item1)
 session.commit()

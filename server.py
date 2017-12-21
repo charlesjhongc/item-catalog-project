@@ -35,6 +35,10 @@ def category_page(category_name):
     return render_template("category_page.html",
                             category=the_category, item_list=the_item_list)
 
+@app.route("/category/<category_name>/<item_name>/")
+def item_page(category_name, item_name):
+    the_item = session.query(Item).filter_by(name=item_name).one()
+    return render_template("item_page.html", item=the_item)
 
 if __name__ == "__main__":
     #app.secret_key = 'super_secret_key'
