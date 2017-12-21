@@ -6,22 +6,30 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+    <link rel="stylesheet" href="/static/custom.css">
   </head>
 
   <body>
     <header>
       <div class="container">
-        <div class="row">
+        <div class="row" id="header_bar">
+          <h1>HEADER</h1>
         </div>
       </div>
     </header>
 
     <main>
       <div class="container">
+        <hr class="my-4">
         <div class="row">
-          {% for cata in categories %}
-          <a href="{{url_for("category_page", category_name=cata.name)}}">{{ cata.name }}</a>
-          {% endfor %}
+          <div class="col-4 list-group">
+            {% for cata in categories %}
+            <a href="{{url_for("category_page", category_name=cata.name)}}" class="list-group-item list-group-item-action">{{ cata.name }}</a>
+            {% endfor %}
+          </div>
+          <div class="col-8">
+            <a class="btn btn-primary" href="{{url_for("item_add_page")}}">Add items</a>
+          </div>
         </div>
       </div>
     </main>
