@@ -49,7 +49,8 @@ class Item(Base):
             "description": self.description,
             "id": self.id,
             "price": self.price,
-            "course": self.course,
+            "category_id": self.category_id,
+            "creator_id": self.user_id,
         }
 
 
