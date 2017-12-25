@@ -12,6 +12,9 @@ import httplib2
 import json
 import requests
 
+from google.oauth2 import id_token
+from google.auth.transport import requests as grequests
+
 
 app = Flask(__name__)
 
@@ -34,98 +37,54 @@ def mainpage():
 
 @app.route("/login")
 def loginpage():
-    return render_template("login.html")
+    state = "".join(random.choice(string.ascii_uppercase + string.digits)
+                    for x in range(32))
+    login_session["state"] = state
+    # return "The current session state is %s" % login_session['state']
+    return render_template("login.html", STATE=state)
 
-@app.route('/gconnect', methods=['POST'])
+@app.route("/gconnect", methods=["POST"])
 def gconnect():
-    # Validate state token
-    if request.args.get('state') != login_session['state']:
-        response = make_response(json.dumps('Invalid state parameter.'), 401)
-        response.headers['Content-Type'] = 'application/json'
-        return response
-    # Obtain authorization code
-    code = request.data
-
+    token = request.form.get("idtoken")
     try:
-        # Upgrade the authorization code into a credentials object
-        oauth_flow = flow_from_clientsecrets('client_secrets.json', scope='')
-        oauth_flow.redirect_uri = 'postmessage'
-        credentials = oauth_flow.step2_exchange(code)
-    except FlowExchangeError:
-        response = make_response(
-            json.dumps('Failed to upgrade the authorization code.'), 401)
-        response.headers['Content-Type'] = 'application/json'
-        return response
+        idinfo = id_token.verify_oauth2_token(token, grequests.Request(), CLIENT_ID)
+        # Or, if multiple clients access the backend server:
+        # idinfo = id_token.verify_oauth2_token(token, requests.Request())
+        # if idinfo['aud'] not in [CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3]:
+        #     raise ValueError('Could not verify audience.')
+        if idinfo['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:
+            raise ValueError('Wrong issuer.')
+        # If auth request is from a G Suite domain:
+        # if idinfo['hd'] != GSUITE_DOMAIN_NAME:
+        #     raise ValueError('Wrong hosted domain.')
 
-    # Check that the access token is valid.
-    access_token = credentials.access_token
-    url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s'
-           % access_token)
-    h = httplib2.Http()
-    result = json.loads(h.request(url, 'GET')[1])
-    # If there was an error in the access token info, abort.
-    if result.get('error') is not None:
-        response = make_response(json.dumps(result.get('error')), 500)
-        response.headers['Content-Type'] = 'application/json'
-        return response
+        # ID token is valid. Get the user's Google Account ID from the decoded token.
+        login_session['username'] = idinfo["name"]
+        login_session['picture'] = idinfo["picture"]
+        login_session['email'] = idinfo["email"]
+        login_session['token'] = token
+        print(idinfo["email"]+" Logged in")
+        user_id = getUserID(idinfo["email"])
+        if not user_id:
+            user_id = createUser(login_session)
+        login_session['user_id'] = user_id
+        return redirect("/")
+    except ValueError:
+        # Invalid token
+        pass
 
-    # Verify that the access token is used for the intended user.
-    gplus_id = credentials.id_token['sub']
-    if result['user_id'] != gplus_id:
-        response = make_response(
-            json.dumps("Token's user ID doesn't match given user ID."), 401)
-        response.headers['Content-Type'] = 'application/json'
-        return response
-
-    # Verify that the access token is valid for this app.
-    if result['issued_to'] != CLIENT_ID:
-        response = make_response(
-            json.dumps("Token's client ID does not match app's."), 401)
-        print("Token's client ID does not match app's.")
-        response.headers['Content-Type'] = 'application/json'
-        return response
-
-    stored_access_token = login_session.get('access_token')
-    stored_gplus_id = login_session.get('gplus_id')
-    if stored_access_token is not None and gplus_id == stored_gplus_id:
-        response = make_response(json.dumps('Current user is already connected.'),
-                                 200)
-        response.headers['Content-Type'] = 'application/json'
-        return response
-
-    # Store the access token in the session for later use.
-    login_session['access_token'] = credentials.access_token
-    login_session['gplus_id'] = gplus_id
-
-    # Get user info
-    userinfo_url = "https://www.googleapis.com/oauth2/v1/userinfo"
-    params = {'access_token': credentials.access_token, 'alt': 'json'}
-    answer = requests.get(userinfo_url, params=params)
-
-    data = answer.json()
-
-    login_session['username'] = data['name']
-    login_session['picture'] = data['picture']
-    login_session['email'] = data['email']
-    # ADD PROVIDER TO LOGIN SESSION
-    login_session['provider'] = 'google'
-
-    # see if user exists, if it doesn't make a new one
-    user_id = getUserID(data["email"])
-    if not user_id:
-        user_id = createUser(login_session)
-    login_session['user_id'] = user_id
-
-    output = ''
-    output += '<h1>Welcome, '
-    output += login_session['username']
-    output += '!</h1>'
-    output += '<img src="'
-    output += login_session['picture']
-    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
-    flash("you are now logged in as %s" % login_session['username'])
-    print("done!")
-    return output
+@app.route("/gdisconnect")
+def gdisconnect():
+    print(login_session['email']+" is going to logged out")
+    requests.post('https://accounts.google.com/o/oauth2/revoke',
+        params={'token': login_session['token']},
+        headers = {'content-type': 'application/x-www-form-urlencoded'})
+    del login_session['username']
+    del login_session['email']
+    del login_session['picture']
+    del login_session['user_id']
+    del login_session['token']
+    return redirect("/")
 
 def createUser(login_session):
     newUser = User(name=login_session["username"], email=login_session[
@@ -162,7 +121,10 @@ def category_page(category_name):
 @app.route("/category/<category_name>/<item_name>/")
 def item_page(category_name, item_name):
     the_item = session.query(Item).filter_by(name=item_name).one()
-    return render_template("item_page.html", item=the_item)
+    if "user_id" in login_session:
+        return render_template("item_page.html", item=the_item, userid=login_session["user_id"])
+    else:
+        return render_template("item_page.html", item=the_item)
 
 @app.route("/category/additem/", methods=["GET","POST"])
 def item_add_page():
