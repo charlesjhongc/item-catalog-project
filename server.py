@@ -59,15 +59,15 @@ def gconnect():
         #     raise ValueError('Wrong hosted domain.')
 
         # ID token is valid. Get the user's Google Account ID from the decoded token.
-        login_session['username'] = idinfo["name"]
-        login_session['picture'] = idinfo["picture"]
-        login_session['email'] = idinfo["email"]
-        login_session['token'] = token
+        login_session["username"] = idinfo["name"]
+        login_session["picture"] = idinfo["picture"]
+        login_session["email"] = idinfo["email"]
+        login_session["token"] = token
         print(idinfo["email"]+" Logged in")
         user_id = getUserID(idinfo["email"])
         if not user_id:
             user_id = createUser(login_session)
-        login_session['user_id'] = user_id
+        login_session["user_id"] = user_id
         return redirect("/")
     except ValueError:
         # Invalid token
@@ -75,15 +75,14 @@ def gconnect():
 
 @app.route("/gdisconnect")
 def gdisconnect():
-    print(login_session['email']+" is going to logged out")
     requests.post('https://accounts.google.com/o/oauth2/revoke',
         params={'token': login_session['token']},
         headers = {'content-type': 'application/x-www-form-urlencoded'})
-    del login_session['username']
-    del login_session['email']
-    del login_session['picture']
-    del login_session['user_id']
-    del login_session['token']
+    del login_session["username"]
+    del login_session["email"]
+    del login_session["picture"]
+    del login_session["user_id"]
+    del login_session["token"]
     return redirect("/")
 
 def createUser(login_session):
