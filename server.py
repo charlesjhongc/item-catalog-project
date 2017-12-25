@@ -127,6 +127,7 @@ def item_page(category_name, item_name):
 
 @app.route("/category/additem/", methods=["GET","POST"])
 def item_add_page():
+    # user can't get this page without login
     if "username" not in login_session:
         return redirect("/login")
     elif request.method == "GET":
@@ -148,6 +149,9 @@ def item_add_page():
 
 @app.route("/category/<item_name>/edit/", methods=["GET","POST"])
 def item_edit_page(item_name):
+    # user can't get this page without login
+    if "username" not in login_session:
+        return redirect("/login")
     the_item = session.query(Item).filter_by(name=item_name).one()
     if request.method == "GET":
         all_category = session.query(Categories).all()
@@ -165,6 +169,9 @@ def item_edit_page(item_name):
 
 @app.route("/category/<item_name>/delete/", methods=["GET","POST"])
 def item_delete_page(item_name):
+    # user can't get this page without login
+    if "username" not in login_session:
+        return redirect("/login")
     the_item = session.query(Item).filter_by(name=item_name).one()
     if request.method == "GET":
         return render_template("item_delete_page.html", item=the_item)
