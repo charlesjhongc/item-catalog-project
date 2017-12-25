@@ -75,9 +75,9 @@ def gconnect():
 
 @app.route("/gdisconnect")
 def gdisconnect():
-    requests.post('https://accounts.google.com/o/oauth2/revoke',
-        params={'token': login_session['token']},
-        headers = {'content-type': 'application/x-www-form-urlencoded'})
+    requests.post("https://accounts.google.com/o/oauth2/revoke",
+        params={"token": login_session["token"]},
+        headers = {"content-type": "application/x-www-form-urlencoded"})
     del login_session["username"]
     del login_session["email"]
     del login_session["picture"]
