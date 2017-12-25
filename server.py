@@ -153,6 +153,9 @@ def item_edit_page(item_name):
     if "username" not in login_session:
         return redirect("/login")
     the_item = session.query(Item).filter_by(name=item_name).one()
+    # user can't get this page if lack ownership of the item
+    if login_session["user_id"] != the_item.user_id:
+        return render_template("accessdenied.html")
     if request.method == "GET":
         all_category = session.query(Categories).all()
         return render_template("item_edit_page.html", categories=all_category, item=the_item)
@@ -173,6 +176,9 @@ def item_delete_page(item_name):
     if "username" not in login_session:
         return redirect("/login")
     the_item = session.query(Item).filter_by(name=item_name).one()
+    # user can't get this page if lack ownership of the item
+    if login_session["user_id"] != the_item.user_id:
+        return render_template("accessdenied.html")
     if request.method == "GET":
         return render_template("item_delete_page.html", item=the_item)
     else:
