@@ -3,11 +3,11 @@
     <div class="row" id="header_bar">
       {% if "user_id" not in session %}
         <h1>Welcome</h1>
-        <a class="btn btn-primary" href="{{url_for("loginpage")}}">Login</a>
       {% else %}
         <h1>Hello {{ session["username"]}}</h1>
-        <a class="btn btn-primary" href="{{url_for("gdisconnect")}}">Logout</a>
       {% endif %}
+      <div class="g-signin2" data-onsuccess="onSignIn"></div>
+      <a href="{{url_for("gdisconnect")}}" onclick="signOut();">Sign out</a>
     </div>
   </div>
 </header>
