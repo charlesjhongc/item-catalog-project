@@ -18,6 +18,9 @@
           {% endfor %}
         </div>
         <a class="btn btn-primary" href="{{url_for("mainpage")}}">HOME</a>
+        {% if "user_id" in session %}
+          <a class="btn btn-primary" href="{{url_for("item_add_page")}}">Add items</a>
+        {% endif %}
       </div>
     </div>
   </div>
