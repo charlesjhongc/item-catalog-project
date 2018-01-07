@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request, redirect, jsonify, url_for, flash
+from flask import Flask, render_template, request,\
+                redirect, jsonify, url_for, flash
 from flask import make_response
 from flask import session as login_session
 from sqlalchemy import create_engine, asc
@@ -33,7 +34,8 @@ session = DBSession()
 @app.route("/")
 def mainpage():
     all_category = session.query(Categories).all()
-    return render_template("publicindex.html",categories=all_category)
+    return render_template("publicindex.html", categories=all_category)
+
 
 @app.route("/login")
 def loginpage():
@@ -43,22 +45,26 @@ def loginpage():
     # return "The current session state is %s" % login_session['state']
     return render_template("login.html", STATE=state)
 
+
 @app.route("/gconnect", methods=["POST"])
 def gconnect():
     token = request.form.get("idtoken")
     try:
-        idinfo = id_token.verify_oauth2_token(token, grequests.Request(), CLIENT_ID)
+        idinfo = id_token.verify_oauth2_token(
+                                        token, grequests.Request(), CLIENT_ID)
         # Or, if multiple clients access the backend server:
         # idinfo = id_token.verify_oauth2_token(token, requests.Request())
         # if idinfo['aud'] not in [CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3]:
         #     raise ValueError('Could not verify audience.')
-        if idinfo['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:
+        if idinfo['iss'] not in [
+                        'accounts.google.com', 'https://accounts.google.com']:
             raise ValueError('Wrong issuer.')
         # If auth request is from a G Suite domain:
         # if idinfo['hd'] != GSUITE_DOMAIN_NAME:
         #     raise ValueError('Wrong hosted domain.')
 
-        # ID token is valid. Get the user's Google Account ID from the decoded token.
+        # ID token is valid. Get the user's
+        # Google Account ID from the decoded token.
         login_session["username"] = idinfo["name"]
         login_session["picture"] = idinfo["picture"]
         login_session["email"] = idinfo["email"]
@@ -73,6 +79,7 @@ def gconnect():
         # Invalid token
         pass
 
+
 @app.route("/gdisconnect")
 def gdisconnect():
     del login_session["username"]
@@ -81,6 +88,7 @@ def gdisconnect():
     del login_session["user_id"]
     del login_session["token"]
     return redirect("/")
+
 
 def createUser(login_session):
     newUser = User(name=login_session["username"], email=login_session[
@@ -91,9 +99,11 @@ def createUser(login_session):
     print("Id of user-{} is {}".format(login_session["email"], user.id))
     return user.id
 
+
 def getUserInfo(user_id):
     user = session.query(User).filter_by(id=user_id).one()
     return user
+
 
 def getUserID(email):
     try:
@@ -102,6 +112,7 @@ def getUserID(email):
     except:
         return None
 
+
 @app.route("/category/<category_name>/")
 def category_page(category_name):
     the_category = session.query(Categories).filter_by(
@@ -109,20 +120,22 @@ def category_page(category_name):
     the_item_list = session.query(Item).filter_by(
                                     category_id=the_category.id).all()
     all_category = session.query(Categories).all()
-    return render_template("category_page.html",
-                            categories=all_category,
-                            category=the_category,
-                            item_list=the_item_list)
+    return render_template(
+        "category_page.html", categories=all_category,
+        category=the_category, item_list=the_item_list)
+
 
 @app.route("/category/<category_name>/<item_name>/")
 def item_page(category_name, item_name):
     the_item = session.query(Item).filter_by(name=item_name).one()
     if "user_id" in login_session:
-        return render_template("item_page.html", item=the_item, userid=login_session["user_id"])
+        return render_template(
+            "item_page.html", item=the_item, userid=login_session["user_id"])
     else:
         return render_template("item_page.html", item=the_item)
 
-@app.route("/category/additem/", methods=["GET","POST"])
+
+@app.route("/category/additem/", methods=["GET", "POST"])
 def item_add_page():
     # user can't get this page without login
     if "username" not in login_session:
@@ -142,9 +155,11 @@ def item_add_page():
         session.add(newitem)
         session.commit()
         flash("New Item %s Successfully Created" % newitem.name)
-        return redirect(url_for("category_page", category_name=the_category.name))
+        return redirect(
+            url_for("category_page", category_name=the_category.name))
 
-@app.route("/category/<item_name>/edit/", methods=["GET","POST"])
+
+@app.route("/category/<item_name>/edit/", methods=["GET", "POST"])
 def item_edit_page(item_name):
     # user can't get this page without login
     if "username" not in login_session:
@@ -155,19 +170,23 @@ def item_edit_page(item_name):
         return render_template("accessdenied.html")
     if request.method == "GET":
         all_category = session.query(Categories).all()
-        return render_template("item_edit_page.html", categories=all_category, item=the_item)
+        return render_template(
+            "item_edit_page.html", categories=all_category, item=the_item)
     else:
-        the_category=session.query(Categories).filter_by(
-                                            name=request.form["category"]).one()
-        the_item.name=request.form["name"]
-        the_item.description=request.form["description"]
-        the_item.price=request.form["price"]
-        the_item.category_id=the_category.id
+        the_category = session.query(Categories).filter_by(
+                                        name=request.form["category"]).one()
+        the_item.name = request.form["name"]
+        the_item.description = request.form["description"]
+        the_item.price = request.form["price"]
+        the_item.category_id = the_category.id
         session.add(the_item)
         session.commit()
-        return redirect(url_for("item_page", category_name=the_category.name, item_name=the_item.name))
+        return redirect(url_for(
+            "item_page", category_name=the_category.name,
+            item_name=the_item.name))
 
-@app.route("/category/<item_name>/delete/", methods=["GET","POST"])
+
+@app.route("/category/<item_name>/delete/", methods=["GET", "POST"])
 def item_delete_page(item_name):
     # user can't get this page without login
     if "username" not in login_session:
@@ -182,6 +201,7 @@ def item_delete_page(item_name):
         session.delete(the_item)
         session.commit()
         return redirect(url_for("mainpage"))
+
 
 @app.route("/category/<category_name>/JSON")
 def categoryJSON(category_name):

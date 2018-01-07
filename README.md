@@ -15,3 +15,5 @@ python item_list.py
 ```python
 python server.py
 ```
+## Start Visiting Website
+Open http://localhost:5000 using your browser.
