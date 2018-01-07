@@ -10,11 +10,13 @@
         <a href="{{url_for("category_page", category_name=cata.name)}}" class="list-group-item list-group-item-action">{{ cata.name }}</a>
         {% endfor %}
       </div>
-      {% if "user_id" in session %}
-        <div class="col-8">
+      <div class="col-8">
+        <h1>This is a simple item catalog</h1>
+        <h4>You can Add/Edit/Delete items after login using your Google Account</h4>
+        {% if "user_id" in session %}
           <a class="btn btn-primary" href="{{url_for("item_add_page")}}">Add items</a>
-        </div>
-      {% endif %}
+        {% endif %}
+      </div>
     </div>
   </div>
 </main>

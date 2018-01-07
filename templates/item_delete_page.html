@@ -10,6 +10,7 @@
         <h3>Are you sure you want to delete?</h3>
         <form action="{{url_for("item_delete_page", item_name=item.name)}}" method="post">
           <button type="submit" class="btn btn-primary">Submit</button>
+          <a class="btn btn-primary" href="{{url_for("mainpage")}}">No</a>
         </form>
       </div>
     </div>

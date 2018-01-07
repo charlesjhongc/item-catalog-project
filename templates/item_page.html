@@ -5,17 +5,19 @@
   <div class="container">
     <hr class="my-4">
     <div class="row">
-      <div class="card">
-        <h4 class="card-header">{{ item.name }}</h4>
-        <div class="card-body">
-          <h6 class="card-title">{{ item.description }}</h6>
-          <p class="card-text">$ {{ item.price }}</p>
-          {% if item.user_id == session["user_id"] %}
-            <a class="btn btn-primary" href="{{url_for("item_edit_page", item_name=item.name)}}">Edit</a>
-            <a class="btn btn-primary" href="{{url_for("item_delete_page", item_name=item.name)}}">Delete</a>
-          {% endif %}
+      <div class="col">
+        <div class="card">
+          <h4 class="card-header">{{ item.name }}</h4>
+          <div class="card-body">
+            <h6 class="card-title">{{ item.description }}</h6>
+            <p class="card-text">$ {{ item.price }}</p>
+            {% if item.user_id == session["user_id"] %}
+              <a class="btn btn-primary" href="{{url_for("item_edit_page", item_name=item.name)}}">Edit</a>
+              <a class="btn btn-primary" href="{{url_for("item_delete_page", item_name=item.name)}}">Delete</a>
+            {% endif %}
+            <a class="btn btn-primary" href="{{url_for("mainpage")}}">HOME</a>
+          </div>
         </div>
-        <a class="btn btn-primary" href="{{url_for("mainpage")}}">HOME</a>
       </div>
     </div>
   </div>

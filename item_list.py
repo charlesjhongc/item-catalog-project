@@ -50,4 +50,4 @@ item1 = Item(name="12-inch MacBook",
 session.add(item1)
 session.commit()
 
-print "added menu items!"
+print("added menu items!")
