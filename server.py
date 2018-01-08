@@ -202,6 +202,7 @@ def item_delete_page(item_name):
         session.commit()
         return redirect(url_for("mainpage"))
 
+
 @app.route("/api/json/item/<item_name>/")
 def itemJSON(item_name):
     the_item = session.query(Item).filter_by(
