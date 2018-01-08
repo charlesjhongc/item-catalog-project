@@ -43,11 +43,18 @@ session.add(catalog3)
 session.commit()
 
 
-item1 = Item(name="12-inch MacBook",
+item1 = Item(name="12-inch MacBook with 1.2GHz CPU",
     description="Light. Years ahead.",
     price="1,299",
     category_id=1, user_id=1)
 session.add(item1)
+session.commit()
+
+item2 = Item(name="12-inch MacBook with 1.3GHz CPU",
+    description="Light. Years ahead.",
+    price="1,599",
+    category_id=1, user_id=1)
+session.add(item2)
 session.commit()
 
 print("added menu items!")

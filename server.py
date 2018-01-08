@@ -202,8 +202,14 @@ def item_delete_page(item_name):
         session.commit()
         return redirect(url_for("mainpage"))
 
+@app.route("/api/json/item/<item_name>/")
+def itemJSON(item_name):
+    the_item = session.query(Item).filter_by(
+                                        name=item_name).one()
+    return jsonify(Item=the_item.serialize)
 
-@app.route("/category/<category_name>/JSON")
+
+@app.route("/api/json/category/<category_name>/")
 def categoryJSON(category_name):
     the_category = session.query(Categories).filter_by(
                                         name=category_name).one()
