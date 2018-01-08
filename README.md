@@ -18,4 +18,9 @@ python server.py
 ## Start Visiting Website
 Open http://localhost:5000 using your browser.
 ## JSON API Endpoint
-Append /JSON to a category page URL will lead to JSON endpoint. For exapme:http://localhost:5000/category/Macbook/JSON
+### Item
+Append category name to http://localhost:5000/api/json/category/  
+For example : http://localhost:5000/api/json/category/Macbook/
+### Category
+Append category name to http://localhost:5000/api/json/item/  
+For example : http://localhost:5000/api/json/item/12-inchMacBook/
